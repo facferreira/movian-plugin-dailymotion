@@ -1,0 +1,15 @@
+{
+	"description": "Dailymotion is a French video-sharing website on which users can upload, watch and share videos.",
+	"author": "Fábio Ferreira",
+	"homepage": "https://github.com/facanferff/movian-plugin-dailymotion",
+	"title": "Dailymotion",
+	"synopsis": "Dailymotion: Video Sharing Service",
+	"version": "0.0.1",
+	"file": "src/generated/dailymotion.js",
+	"showtimeVersion": "5.0",
+	"type": "ecmascript",
+	"id": "dailymotion",
+	"icon": "icon.png",
+	"category": "video",
+	"apiversion": 2
+}

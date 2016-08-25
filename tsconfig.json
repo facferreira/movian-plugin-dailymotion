@@ -1,0 +1,17 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "classic",
+        "sourceMap": false,
+        "outDir": "src/generated",
+        "lib": [
+            "es5",
+            "es2015.core",
+            "es2015.proxy"
+        ],
+        "watch": true
+    },
+    "exclude": []
+}
