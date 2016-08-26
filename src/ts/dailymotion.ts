@@ -27,14 +27,14 @@ import general = require('./support/general');
 import { log, LogType } from './support/log';
 import plugin = require('./support/plugin');
 import playback = require('./support/playback');
+import view = require('./support/view');
 
 var PLUGIN_NAME = "Dailymotion";
-var PREFIX = "dailymotion";
 var PLUGIN_DESCRIPTOR = plugin.getDescriptor();
 
-var s = service.create(PLUGIN_NAME, PREFIX + ":start", PLUGIN_DESCRIPTOR.category, true, plugin.getIconPath());
+var s = service.create(PLUGIN_NAME, general.PREFIX + ":start", PLUGIN_DESCRIPTOR.category, true, plugin.getIconPath());
 
-settings.globalSettings(PREFIX, PLUGIN_NAME, plugin.getIconPath(), PLUGIN_DESCRIPTOR.synopsis);
+settings.globalSettings(general.PREFIX, PLUGIN_NAME, plugin.getIconPath(), PLUGIN_DESCRIPTOR.synopsis);
 
 settings.createDivider("Video Playback");
 
@@ -42,19 +42,34 @@ settings.createMultiOpt('maxQuality', "Maximum quality", general.availableQualit
     general.pluginConfig.maxQuality = quality;
 }, true);
 
-new page.Route(PREFIX + ":start", function (page) {
-    page.type = "directory";
+new page.Route(general.PREFIX + ":start", function (page) {
+    view.home(page);
 });
 
-new page.Route(PREFIX + ":video:(.*)", function (page, id) {
-    page.type = "video";
-    page.loading = true;
-    var html = playback.getVideoEmbedPage(id);
+new page.Route(general.PREFIX + ":channels", function (page) {
+    view.channels(page);
+});
 
-    var videoparams = {
-        sources: playback.getVideoSources(html)
-    }
-    log.print(videoparams);
+new page.Route(general.PREFIX + ":channel:(.*)", function (page, channel) {
+    view.channel(page, channel);
+});
 
-    page.source = "videoparams:" + JSON.stringify(videoparams);
+new page.Route(general.PREFIX + ":channel:(.*):topusers", function (page, channel) {
+    view.channelTopUsers(page, channel);
+});
+
+new page.Route(general.PREFIX + ":channel:(.*):videos", function (page, channel) {
+    view.channelVideos(page, channel);
+});
+
+new page.Route(general.PREFIX + ":video:(.*):(.*)", function (page, type, id) {
+    view.video(page, type, id);
+});
+
+new page.Route(general.PREFIX + ":search:(.*)", function (page, query) {
+    view.search(page, query);
+});
+
+new page.Searcher("Dailymotion - Search Videos", plugin.getIconPath(), function (page, query) {
+    view.search(page, query);
 });

@@ -77,7 +77,11 @@ export function isSuccess(result: HttpCallbackResult) {
 function createCallbackResult(err, response): HttpCallbackResult {
     if (response) {
         var statuscode = response.statuscode;
-        if (200 <= statuscode && statuscode < 400) {
+        if (statuscode == 0) {
+            // response from cache
+            return createCallbackSuccess(0, response);
+        }
+        else if (200 <= statuscode && statuscode < 400) {
             return createCallbackSuccess(statuscode, response);
         }
         else {

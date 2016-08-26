@@ -1,6 +1,8 @@
+export const PREFIX = "dailymotion";
+
 export var availableQualities: MultiOptOption[] = [
-    ['2160', '4K'],
-    ['1440', '2K'],
+    // ['2160', '4K'],
+    // ['1440', '2K'],
     ['1080', '1080p', true],
     ['720', '720p'],
     ['480', '480p'],

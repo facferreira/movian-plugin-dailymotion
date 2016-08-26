@@ -11,8 +11,29 @@ declare var Plugin: {
     readonly path: string;
 }
 
+declare interface VideoParams {
+    title?: string;
+    icon?: string;
+    no_fs_scan?: boolean;
+    no_subtitle_scan?: boolean;
+    canonicalUrl?: string;
+    sources?: VideoSource[];
+    subtitles?: VideoSubtitle[];
+    imdbid?: string;
+    year?: number;
+    season?: number;
+    episode?: number;
+}
+
 declare interface VideoSource {
     url: string;
     bitrate?: number;
     mimetype?: string;
+}
+
+declare interface VideoSubtitle {
+    title: string;
+    url: string;
+    language?: string;
+    source?: string;
 }
