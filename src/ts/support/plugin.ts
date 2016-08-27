@@ -1,5 +1,5 @@
 function getRootPath() {
-    return Plugin.path + "../../";
+    return Plugin.path;
 }
 
 export function getDescriptor() {

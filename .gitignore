@@ -2,3 +2,7 @@ src/generated
 .vscode
 releases
 node_modules
+
+// exclude js files
+dailymotion.js
+support

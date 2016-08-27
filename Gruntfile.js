@@ -9,7 +9,8 @@ module.exports = function(grunt) {
                     archive: 'releases/release_' + version + '.zip'
                 },
                 files: [
-                    {src: ['src/generated/**'], dest: '/'},
+                    {src: ['dailymotion.js'], dest: '/'},
+                    {expand: true, src: ['support/**.js'], dest: '/'},
                     {src: ['icon.png'], dest: '/'},
                     {src: ['LICENSE'], dest: '/'},
                     {src: ['plugin.json'], dest: '/'}
