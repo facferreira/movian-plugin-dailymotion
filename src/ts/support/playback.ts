@@ -25,6 +25,8 @@ export function getVideoEmbedPage(id: string): string {
 export function getVideoSources(document: string): VideoSource[] {
     var playerConfig = getPlayerConfig(document);
     var qualitiesObj = playerConfig.metadata.qualities;
+    
+    log.print(playerConfig);
 
     if (playerConfig.metadata.stream_type !== "live") {
         var i = 0;
@@ -66,6 +68,24 @@ export function getVideoSources(document: string): VideoSource[] {
     }
 
     throw new Error("I'm sorry but I can't play this video :( , please report it");
+}
+
+export function getVideoSubtitles(document: string): VideoSubtitle[] {
+    var playerConfig = getPlayerConfig(document);
+    var subtitlesObj = playerConfig.metadata.subtitles.data;
+
+    var subtitles: VideoSubtitle[] = [];
+    for (var language in subtitlesObj) {
+        var subtitleObj = subtitlesObj[language];
+        subtitles.push({
+            url: subtitleObj.urls[0],
+            title: subtitleObj.label,
+            language: language,
+            source: "Dailymotion"
+        });
+    }
+
+    return subtitles;
 }
 
 export function getVideoCover(document: string): string {

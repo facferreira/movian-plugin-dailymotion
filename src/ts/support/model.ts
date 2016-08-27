@@ -51,6 +51,7 @@ export function getVideoPlaybackData(type: string, videoId: string): VideoParams
     return {
         title: playback.getVideoTitle(html),
         sources: playback.getVideoSources(html),
+        subtitles: playback.getVideoSubtitles(html),
         icon: playback.getVideoCover(html),
         no_fs_scan: true,
         no_subtitle_scan: true,
