@@ -1,5 +1,5 @@
 import http = require('./http');
-import { log } from './log';
+import { log, LogType } from './log';
 
 const API_BASE_URL = "https://api.dailymotion.com";
 const API_KEY = "6a371ca96111be56feea";
@@ -84,7 +84,14 @@ export function call(uri: string, fields: string[], filters: any, config: any, c
         },
 
         onError: function (result) {
-            log.print(result);
+            log.print("API call failed", LogType.ERROR);
+            log.print("URL: " + url, LogType.ERROR);
+            log.print("Filters", LogType.ERROR);
+            log.print(filters, LogType.ERROR);
+            log.print("Opts:", LogType.ERROR);
+            log.print(opts, LogType.ERROR);
+            log.print("Result", LogType.ERROR);
+            log.print(result, LogType.ERROR);
             callback.onError({
                 type: ApiCallbackResultType.ERROR,
                 message: result.message

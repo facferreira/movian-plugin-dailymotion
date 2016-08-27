@@ -11,7 +11,6 @@ interface ModelPagination {
 interface ModelCallbackResultSuccess {
     type: ModelCallbackResultType.SUCCESS;
     json: any;
-    pagination: ModelPagination;
 }
 
 interface ModelCallbackResultError {
@@ -86,8 +85,7 @@ function apiCallback(model: Function, callback: ModelCallback) {
         onSuccess: function (result: api.ApiCallbackResultSuccess) {
             callback.onSuccess({
                 type: ModelCallbackResultType.SUCCESS,
-                json: result.json,
-                pagination: createPaginationObject(model, result.json)
+                json: result.json
             });
         },
 
@@ -98,19 +96,6 @@ function apiCallback(model: Function, callback: ModelCallback) {
             });
         }
     };
-}
-
-function createPaginationObject(model: Function, json) {
-    var pagination = {
-        hasNext: json.has_more,
-        next: null
-    };
-
-    if (json.has_more) {
-        pagination.next = model.bind(null, json.page + 1);
-    }
-
-    return pagination;
 }
 
 function getChannelFields() {

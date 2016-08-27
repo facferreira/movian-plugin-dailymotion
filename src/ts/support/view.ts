@@ -91,11 +91,12 @@ function createAndExecuteLoader(page: Page, model: Function, filters, config: Co
         onSuccess: function (result) {
             page.loading = false;
 
-            for (var i in result.json.list) {
+            var json = result.json;
+            for (var i in json.list) {
                 if (config.numberItems && page.entries >= config.numberItems)
                     break;
 
-                var item = result.json.list[i];
+                var item = json.list[i];
 
                 var pageItem = addItemToPage(page, item);
                 if (config.beforeItem) pageItem.moveBefore(config.beforeItem);
@@ -112,7 +113,7 @@ function createAndExecuteLoader(page: Page, model: Function, filters, config: Co
             }
 
             if (config.noPaginator) {
-                if (config.moreItemsUri && result.pagination.hasNext) {
+                if (config.moreItemsUri && json.has_more) {
                     var pageItem = page.appendItem(config.moreItemsUri, "directory", {
                         "title": "See more"
                     });
@@ -122,9 +123,10 @@ function createAndExecuteLoader(page: Page, model: Function, filters, config: Co
                 page.haveMore(false);
             }
             else {
-                if (result.pagination.hasNext) {
+                if (json.has_more) {
                     // more pages!
-                    page.asyncPaginator = result.pagination.next.bind(null, config, modelCallback);
+                    filters.page = json.page + 1;
+                    page.asyncPaginator = model.bind(null, filters, config, modelCallback);
                     page.haveMore(true);
                 }
             }
