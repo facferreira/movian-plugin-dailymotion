@@ -64,15 +64,19 @@ export function searchVideos(filters: api.VideoFilters, config, callback: ModelC
 }
 
 export function getAvailableVideoSorts(issearch: boolean): MultiOptOption[] {
-    var sorts: MultiOptOption[] = [
-        ['recent', 'Most Recent', true],
-        ['visited', 'Most Visited'],
-        ['commented', 'Most Commented'],
-        ['trending', 'Most Trending']
-    ];
+    var sorts: MultiOptOption[] = [];
 
     if (issearch)
         sorts.push(['relevance', 'Relevance']);
+        
+    sorts = sorts.concat([
+        ['recent', 'Most Recent'],
+        ['visited', 'Most Visited'],
+        ['commented', 'Most Commented'],
+        ['trending', 'Most Trending']
+    ]);
+
+    sorts[0][2] = true;
 
     return sorts;
 }
