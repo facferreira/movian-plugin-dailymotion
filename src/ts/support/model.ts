@@ -58,6 +58,14 @@ export function getVideoPlaybackData(type: string, videoId: string): VideoParams
     };
 }
 
+export function getUserVideos(userId: string, filters: api.VideoFilters, config, callback: ModelCallback) {
+    api.call("/user/" + userId + "/videos", getVideoFields(), filters, config, apiCallback(getUserVideos.bind(null, userId), callback));
+}
+
+export function searchUsers(filters: api.UserFilters, config, callback: ModelCallback) {
+    api.call("/users", getUserFields(), filters, config, apiCallback(searchVideos, callback));
+}
+
 export function searchVideos(filters: api.VideoFilters, config, callback: ModelCallback) {
     api.call("/videos", getVideoFields(), filters, config, apiCallback(searchVideos, callback));
 }
@@ -122,7 +130,8 @@ function getVideoFields() {
         'id',
         'item_type',
         'mode',
-        'owner',
+        'owner.id',
+        'owner.screenname',
         'thumbnail_480_url',
         'title',
         'views_total'

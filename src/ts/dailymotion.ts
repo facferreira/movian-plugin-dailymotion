@@ -70,6 +70,26 @@ new page.Route(general.PREFIX + ":search:(.*)", function (page, query) {
     view.search(page, query);
 });
 
+new page.Route(general.PREFIX + ":search:users:(.*)", function (page, query) {
+    view.searchUsers(page, decodeURIComponent(query));
+});
+
+new page.Route(general.PREFIX + ":search:videos:(.*)", function (page, query) {
+    view.searchVideos(page, decodeURIComponent(query));
+});
+
+new page.Route(general.PREFIX + ":user:(.*):(.*)", function (page, user, screenname) {
+    view.user(page, user, screenname);
+});
+
+new page.Route(general.PREFIX + ":user:(.*):(.*):videos", function (page, user, screenname) {
+    view.userVideos(page, user, screenname);
+});
+
+new page.Searcher("Dailymotion - Search Users", plugin.getIconPath(), function (page, query) {
+    view.searchUsers(page, query);
+});
+
 new page.Searcher("Dailymotion - Search Videos", plugin.getIconPath(), function (page, query) {
-    view.search(page, query);
+    view.searchVideos(page, query);
 });

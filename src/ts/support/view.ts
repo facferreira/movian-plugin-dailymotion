@@ -8,6 +8,7 @@ import plugin = require('./plugin');
 interface Config {
     beforeItem?: Item;
     moreItemsUri?: string;
+    noPageMenu?: boolean;
     noPaginator?: boolean;
     numberItems?: number;
     sorts?: MultiOptOption[];
@@ -26,23 +27,29 @@ function addVideoItemToPage(page: Page, item): Item {
         duration: item.duration,
         icon: item.thumbnail_480_url,
         views: item.views_total
-
     }
 
     switch (item.mode) {
         case "vod":
-            return page.appendItem(general.PREFIX + ":video:vod:" + item.id, 'video', metadata);
+            var pageItem = page.appendItem(general.PREFIX + ":video:vod:" + item.id, 'video', metadata);
+            break;
 
         case "live":
-            return page.appendItem(general.PREFIX + ":video:live:" + item.id, 'video', metadata);
+            var pageItem = page.appendItem(general.PREFIX + ":video:live:" + item.id, 'video', metadata);
+            break;
 
         default:
             throw new Error("Unsupported video mode: " + item.mode);
     }
+
+    pageItem.addOptURL("More from " + item['owner.screenname'], 
+        general.PREFIX + ":user:" + item['owner.id'] + ":" + item['owner.screenname'], 'directory');
+
+    return pageItem;
 }
 
 function addUserItemToPage(page: Page, item): Item {
-    return page.appendItem(general.PREFIX + ":user:" + item.id, 'directory', {
+    return page.appendItem(general.PREFIX + ":user:" + item.id + ":" + item.screenname, 'directory', {
         title: item.screenname,
         icon: item.avatar_360_url
     });
@@ -79,7 +86,7 @@ function initializePageMenu(page: Page, model: Function, filters, config: Config
                 filters.sort = sort;
 
                 // if we had a value for this filter then this is not the inital initialization
-                if (original)
+                if (original && original !== filters.sort)
                     resetList(page, model, filters, config);
             }, true);
         }
@@ -87,13 +94,15 @@ function initializePageMenu(page: Page, model: Function, filters, config: Config
 }
 
 function createAndExecuteLoader(page: Page, model: Function, filters, config: Config) {
+    var processedEntries = 0;
+
     var modelCallback: model.ModelCallback = {
         onSuccess: function (result) {
             page.loading = false;
 
             var json = result.json;
             for (var i in json.list) {
-                if (config.numberItems && page.entries >= config.numberItems)
+                if (config.numberItems && processedEntries >= config.numberItems)
                     break;
 
                 var item = json.list[i];
@@ -102,9 +111,10 @@ function createAndExecuteLoader(page: Page, model: Function, filters, config: Co
                 if (config.beforeItem) pageItem.moveBefore(config.beforeItem);
 
                 page.entries++;
+                processedEntries++;
             }
 
-            if (page.entries === 0) {
+            if (processedEntries === 0) {
                 page.appendPassiveItem("default", null, {
                     "title": "There are no resources available"
                 });
@@ -157,6 +167,10 @@ function templateList(page: Page, model: Function, filters, config: Config) {
     if (config.numberItems)
         filters['limit'] = config.numberItems;
 
+    if (config.sorts)
+        filters['sort'] = config.sorts[0][0];
+    
+    if (!config.noPageMenu)
     initializePageMenu(page, model, filters, config);
 
     createAndExecuteLoader(page, model, filters, config);
@@ -218,7 +232,51 @@ export function video(page: Page, type: string, id: string) {
 }
 
 export function search(page: Page, query: string) {
-    page.metadata.title = "Dailymotion - " + query;
+    query = decodeURIComponent(query);
+
+    page.metadata.title = "Dailymotion Search - " + query;
+    page.metadata.icon = plugin.getIconPath();
+
+    var filters = {
+        search: query
+    };
+
+    // separators
+    var separatorUsers = page.appendPassiveItem('separator', null, {
+        title: "Users"
+    });
+    var separatorVideos = page.appendPassiveItem('separator', null, {
+        title: "Videos"
+    });
+
+    templateList(page, model.searchUsers, filters, {
+        noPageMenu: true,
+        noPaginator: true,
+        numberItems: 4,
+        moreItemsUri: general.PREFIX + ":search:users:" + encodeURIComponent(query),
+        beforeItem: separatorVideos
+    })
+    templateList(page, model.searchVideos, filters, {
+        noPageMenu: true,
+        noPaginator: true,
+        numberItems: 4,
+        moreItemsUri: general.PREFIX + ":search:videos:" + encodeURIComponent(query),
+        sorts: [model.getAvailableVideoSorts(true)[0]]
+    })
+}
+
+export function searchUsers(page: Page, query: string) {
+    page.metadata.title = "Dailymotion - Users";
+    page.metadata.icon = plugin.getIconPath();
+
+    var filters = {
+        search: query
+    };
+    templateList(page, model.searchUsers, filters, {});
+}
+
+export function searchVideos(page: Page, query: string) {
+    page.metadata.title = "Dailymotion - Videos";
     page.metadata.icon = plugin.getIconPath();
 
     var filters = {
@@ -226,5 +284,24 @@ export function search(page: Page, query: string) {
     };
     templateList(page, model.searchVideos, filters, {
         sorts: model.getAvailableVideoSorts(true)
+    });
+}
+
+export function user(page: Page, user: string, screenname: string) {
+    page.type = 'directory';
+    page.metadata.title = "User " + screenname;
+    page.metadata.icon = plugin.getIconPath();
+
+    page.appendItem(general.PREFIX + ":user:" + user + ":" + screenname + ":videos", 'directory', {
+        title: "Videos"
+    });
+}
+
+export function userVideos(page: Page, user: string, screenname: string) {
+    page.metadata.title = "User " + screenname + " - Videos";
+    page.metadata.icon = plugin.getIconPath();
+
+    templateList(page, model.getUserVideos.bind(null, user), {}, {
+        sorts: model.getAvailableVideoSorts(false)
     });
 }

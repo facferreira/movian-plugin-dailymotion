@@ -39,6 +39,9 @@ export interface ChannelFilters extends BaseFilters {
     sort?: string;
 }
 
+export interface UserFilters extends BaseFilters {
+}
+
 export interface VideoFilters extends BaseFilters {
     sort?: string;
 }
@@ -71,8 +74,12 @@ export function call(uri: string, fields: string[], filters: any, config: any, c
     if (!opts.args.limit)
         opts.args.limit = MAX_LIMIT;
 
+    log.print("Requesting " + url);
+
     http.request(url, opts, {
         onSuccess: function (result) {
+            log.print("API call succeeded: " + url);
+
             var json = JSON.parse(result.response);
 
             var obj: ApiCallbackResultSuccess = {
