@@ -62,10 +62,6 @@ new page.Route(general.PREFIX + ":channel:(.*):videos", function (page, channel)
     view.channelVideos(page, channel);
 });
 
-new page.Route(general.PREFIX + ":video:(.*):(.*)", function (page, type, id) {
-    view.video(page, type, id);
-});
-
 new page.Route(general.PREFIX + ":search:(.*)", function (page, query) {
     view.search(page, query);
 });
@@ -85,6 +81,9 @@ new page.Route(general.PREFIX + ":user:(.*):(.*)", function (page, user, screenn
 new page.Route(general.PREFIX + ":user:(.*):(.*):videos", function (page, user, screenname) {
     view.userVideos(page, user, screenname);
 });
+
+new page.Route(general.PREFIX + ":video:(.*)", view.video);
+new page.Route("https?://www\.dailymotion\.com/video/([^_]+)", view.video);
 
 new page.Searcher("Dailymotion - Search Users", plugin.getIconPath(), function (page, query) {
     view.searchUsers(page, query);

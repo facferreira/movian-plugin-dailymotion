@@ -29,18 +29,7 @@ function addVideoItemToPage(page: Page, item): Item {
         views: item.views_total
     }
 
-    switch (item.mode) {
-        case "vod":
-            var pageItem = page.appendItem(general.PREFIX + ":video:vod:" + item.id, 'video', metadata);
-            break;
-
-        case "live":
-            var pageItem = page.appendItem(general.PREFIX + ":video:live:" + item.id, 'video', metadata);
-            break;
-
-        default:
-            throw new Error("Unsupported video mode: " + item.mode);
-    }
+    var pageItem = page.appendItem(general.PREFIX + ":video:" + item.id, 'video', metadata);
 
     pageItem.addOptURL("More from " + item['owner.screenname'], 
         general.PREFIX + ":user:" + item['owner.id'] + ":" + item['owner.screenname'], 'directory');
@@ -224,11 +213,11 @@ export function channelVideos(page: Page, channel: string) {
     });
 }
 
-export function video(page: Page, type: string, id: string) {
+export function video(page: Page, id: string) {
     page.type = "video";
     page.loading = true;
 
-    page.source = "videoparams:" + JSON.stringify(model.getVideoPlaybackData(type, id));
+    page.source = "videoparams:" + JSON.stringify(model.getVideoPlaybackData(id));
 }
 
 export function search(page: Page, query: string) {

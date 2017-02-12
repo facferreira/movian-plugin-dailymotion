@@ -4,8 +4,7 @@ import general = require('./general');
 import { log } from './log';
 
 function getPlayerConfig(document: string) {
-    var playConfigStr = document.match("window.playerV5 = dmp.create(.*)")[1].replace("(document.getElementById('player'), ", "");
-    playConfigStr = playConfigStr.substring(0, playConfigStr.length - 2);
+    var playConfigStr = document.match(/var config = (.*);/)[1];
     return JSON.parse(playConfigStr);
 }
 
@@ -25,8 +24,6 @@ export function getVideoEmbedPage(id: string): string {
 export function getVideoSources(document: string): VideoSource[] {
     var playerConfig = getPlayerConfig(document);
     var qualitiesObj = playerConfig.metadata.qualities;
-    
-    log.print(playerConfig);
 
     if (playerConfig.metadata.stream_type !== "live") {
         var i = 0;
@@ -39,20 +36,22 @@ export function getVideoSources(document: string): VideoSource[] {
             i++;
         }
 
-        log.print(qualitiesObj);
-
         // attempt to find a valid quality, going from that maximum quality to the lowest possible
         while (i < general.availableQualities.length) {
             var qualityId = general.availableQualities[i][0];
             var quality = general.availableQualities[i][1];
             var obj = qualitiesObj[qualityId];
             if (obj) {
-                obj = obj[0];
-                log.print("Found video URL with resolution " + quality);
-                return [{
-                    url: obj.url,
-                    mimetype: obj.type
-                }];
+                for (var j in obj) {
+                    var videoSourceItem = obj[j];
+                    if (videoSourceItem.type === "video/mp4") {
+                        log.print("Found video URL with resolution " + quality);
+                        return [{
+                            url: videoSourceItem.url,
+                            mimetype: videoSourceItem.type
+                        }];
+                    }
+                }
             }
 
             i++;
@@ -91,6 +90,11 @@ export function getVideoSubtitles(document: string): VideoSubtitle[] {
 export function getVideoCover(document: string): string {
     var playerConfig = getPlayerConfig(document);
     return playerConfig.metadata.poster_url;
+}
+
+export function getVideoStreamType(document: string): string {
+    var playerConfig = getPlayerConfig(document);
+    return playerConfig.metadata.stream_type;
 }
 
 export function getVideoTitle(document: string): string {

@@ -44,8 +44,9 @@ export function getChannelVideos(channelId: string, filters: api.VideoFilters, c
     api.call("/channel/" + channelId + "/videos", getVideoFields(), filters, config, apiCallback(getChannelVideos.bind(null, channelId), callback));
 }
 
-export function getVideoPlaybackData(type: string, videoId: string): VideoParams {
+export function getVideoPlaybackData(videoId: string): VideoParams {
     var html = playback.getVideoEmbedPage(videoId);
+    var type = playback.getVideoStreamType(html);
 
     return {
         title: playback.getVideoTitle(html),
